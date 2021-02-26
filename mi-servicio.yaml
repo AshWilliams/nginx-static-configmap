@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-static
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: demo-static
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-static
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-static
+  template:
+    metadata:
+      labels:
+        app: demo-static
+    spec:
+      containers:
+      - name: demo-static
+        image: ashwilliams/static:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: endpoint-config
+          mountPath: /usr/share/nginx/html/config
+      volumes:
+      - name: endpoint-config
+        configMap:
+          # Provide the name of the ConfigMap containing the files you want
+          # to add to the container
+          name: endpoint-config
